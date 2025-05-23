@@ -138,7 +138,7 @@ echo "echo current dir is $PWD"
 kine  > /tmp/kine.log 2>&1 &
 KINEPID=$!
 echo "waiting for kine to start up"
-sleep 5
+sleep 10
 echo "✅ Started kine. Logs: /tmp/kine.log, pid: $KINEPID"
 
 
@@ -156,15 +156,14 @@ $SCRIPT_DIR/bin/kube-apiserver \
 --service-account-key-file="$saKeyPath" \
 --service-account-signing-key-file="$saKeyPath" \
 --service-account-issuer=https://kubernetes.default.svc \
+--allow-privileged=true \
 --v=6 > /tmp/kube-apiserver.log 2>&1 &
 KAPIPID=$!
 echo "waiting for kube-apiserver to start up"
 sleep 5
 echo "✅ Started kube-apiserver. Logs at /tmp/kube-apiserver.log"
 
-echo "sleeping..plesae try kcpcl now..."
-sleep 10000
-exit 0
+kubectl --kubeconfig="$kubeconfig" config use-context local
 
 genSchedulerConfig
 echo "⌛ Starting kube-scheduler"
@@ -175,7 +174,7 @@ $SCRIPT_DIR/bin/kube-scheduler \
 --v=4 > /tmp/kapi-kube-scheduler.log 2>&1 &
 KSCHDPID=$!
 echo "waiting for kube-scheduler to start up"
-sleep 5
+sleep 10
 echo "✅ Started kube-scheduler. Logs at /tmp/kube-scheduler.log"
 
 echo "⌛ Staring procmon"
@@ -193,3 +192,11 @@ time kcpcl upload -d ${OBJ_DIR} -k $DEST_KUBECONFIG
 echo "⌛ waiting for STABILIZE_SECS: $STABILIZE_SECS for minkapi cluster to stabilise..."
 sleep  $STABILIZE_SECS #TODO: loop over pod-node assignments until no changes for 20seconds
 
+reportDirPath="docs/reports/${perfDirName}"
+mkdir -p "$reportDirPath"
+if [[ -d "$perfDirPath" ]]; then
+  echo "Copying Reports from $perfDirPath to docs/$perfDirName"
+  cp -r $perfDirPath/* "${reportDirPath}"
+fi
+echo "✅ DONE!"
+exit 0

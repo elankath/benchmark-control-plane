@@ -7,8 +7,8 @@ echoErr() { echo "$@" 1>&2; }
 go install -buildvcs=true github.com/k3s-io/kine@latest
 go install -buildvcs=true github.com/elankath/procmon@v0.1.0
 go install -buildvcs=true github.com/elankath/kubestress@v0.1.4
-go install -buildvcs=true github.com/elankath/minkapi@v0.1.7
-go install -buildvcs=true github.com/elankath/kcpcl@v0.1.7
+go install -buildvcs=true github.com/elankath/minkapi@v0.1.8
+go install -buildvcs=true github.com/elankath/kcpcl@v0.1.8
 
 KSRC="$HOME/go/src/k8s.io/kubernetes/"
 PROJ_DIR=$(dirname "$(realpath "$0")")
