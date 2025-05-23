@@ -5,13 +5,14 @@ echoErr() { echo "$@" 1>&2; }
 
 
 helperDir=$(dirname "$(realpath "$0")")
+declare caKeyPath caCrtPath apiServerKeyPath apiServerCsrPath apiServerCnfPath apiServerCrtPath clientKeyPath clientCsrPath clientCrtPath saKeyPath kubeconfig
 function validateKubeBinariesBuilt() {
-  if [ ! -x ./bin/kube-apiserver ]; then
+  if [ ! -x "$helperDir/../bin/kube-apiserver" ]; then
       echo "Err: kube-apiserver binary not found in bin/. Please run the setup.sh script."
       exit 1
   fi
 
-  if [ ! -x ./bin/kube-scheduler ]; then
+  if [ ! -x "$helperDir/../bin/kube-scheduler" ]; then
       echo "Err: kube-scheduler binary not found in bin/. Please run the setup.sh script."
       exit 1
   fi
@@ -35,14 +36,21 @@ function generate_certs() {
   mkdir -p gen
 
   # Generate CA cert and key
-  openssl genrsa -out gen/ca.key 2048
-  openssl req -x509 -new -nodes -key gen/ca.key -subj "/CN=kube-ca" -days 10000 -out gen/ca.crt
+  caKeyPath="$helperDir/../gen/ca.key"
+  caCrtPath="$helperDir/../gen/ca.crt"
+  openssl genrsa -out "$caKeyPath" 2048
+  openssl req -x509 -new -nodes -key "$caKeyPath" -subj "/CN=kube-ca" -days 10000 -out "$caCrtPath"
 
   #Generate server cert for kube-apiserver
-  openssl genrsa -out gen/apiserver.key 2048
-  openssl req -new -key gen/apiserver.key -subj "/CN=kube-apiserver" -out gen/apiserver.csr
+  apiServerKeyPath="${helperDir}/../gen/apiserver.key"
+  apiServerCsrPath="${helperDir}/../gen/apiserver.csr"
+  echo "Generating apiserver key at ${apiServerKeyPath}"
+  openssl genrsa -out "${apiServerKeyPath}" 2048
+  echo "Generating apiserver csr at ${apiServerCsrPath}"
+  openssl req -new -key "$apiServerKeyPath" -subj "/CN=kube-apiserver" -out "$apiServerCsrPath"
 
-  cat > gen/apiserver-ext.cnf <<EOF
+apiServerCnfPath="${helperDir}/../gen/apiserver-ext.cfn"
+  cat > "${apiServerCnfPath}" <<EOF
 [ v3_ext ]
 subjectAltName = @alt_names
 
@@ -51,19 +59,45 @@ DNS.1 = localhost
 IP.1 = 127.0.0.1
 EOF
 
-  openssl x509 -req -in gen/apiserver.csr -CA gen/ca.crt -CAkey gen/ca.key -CAcreateserial \
-    -out gen/apiserver.crt -days 10000 -extensions v3_ext -extfile gen/apiserver-ext.cnf
+  apiServerCrtPath="${helperDir}/../gen/apiserver.crt"
+  openssl x509 -req -in "$apiServerCsrPath"  -CA "$caCrtPath"  -CAkey "$caKeyPath"  -CAcreateserial \
+    -out  "$apiServerCrtPath" -days 10000 -extensions v3_ext -extfile "$apiServerCnfPath"
 
   #Generate client cert for kubectl
 
-  openssl genrsa -out gen/client.key 2048
-  openssl req -new -key gen/client.key -subj "/CN=admin/O=system:masters" -out gen/client.csr
+  clientKeyPath="$helperDir/../gen/client.key"
+  clientCsrPath="$helperDir/../gen/client.csr"
+  openssl genrsa -out "$clientKeyPath" 2048
+  openssl req -new -key "$clientKeyPath" -subj "/CN=admin/O=system:masters" -out "$clientCsrPath"
 
-  openssl x509 -req -in gen/client.csr -CA gen/ca.crt -CAkey gen/ca.key -CAcreateserial \
-    -out gen/client.crt -days 10000
+  clientCrtPath="$helperDir/../gen/client.crt"
+  openssl x509 -req -in "$clientCsrPath" -CA "$caCrtPath"  -CAkey "$caKeyPath"  -CAcreateserial \
+    -out "$clientCrtPath" -days 10000
 
+  saKeyPath="$helperDir/../gen/sa.key"
   #Generate service account key file
-  openssl genrsa -out gen/sa.key 2048
+  openssl genrsa -out  "$saKeyPath" 2048
+}
+
+function generate_kubeconfig() {
+  echo "Creating kubeconfig for the cluster"
+  kubeconfig="${helperDir}/../gen/kubeconfig"
+  kubectl config set-cluster local \
+    --certificate-authority="$caCrtPath" \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig="$kubeconfig" \
+    --embed-certs=true
+
+  kubectl config set-credentials admin \
+    --client-certificate="$clientCrtPath" \
+    --client-key="$clientKeyPath"  \
+    --kubeconfig="$kubeconfig" \
+    --embed-certs=true
+
+  kubectl config set-context local \
+    --cluster=local \
+    --user=admin \
+    --kubeconfig="$kubeconfig"
 }
 
 function downloadObjectsFromCluster() {

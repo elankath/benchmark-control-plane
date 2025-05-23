@@ -79,7 +79,7 @@ function validate_args() {
   fi
 }
 
-function generateKubeConfigs() {
+function generateViewerKubeConfigs() {
   echo "Targeting garden cluster..."
   gardenctl target --garden "$LANDSCAPE"
 
@@ -126,7 +126,7 @@ trap cleanup EXIT INT TERM
 echo "Setup signal handler"
 
 
-generateKubeConfigs
+generateViewerKubeConfigs
 downloadObjectsFromCluster
 
 echo "⌛ Starting minkapi"

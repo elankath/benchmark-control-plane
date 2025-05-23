@@ -77,8 +77,8 @@ function validate_args() {
   fi
 }
 
-function generateKubeConfigs() {
-  echo "Targeting garden cluster..."
+function generateViewerKubeConfigs() {
+  echo "Targeting garden cluster -> $LANDSCAPE:$PROJECT:$SHOOT"
   gardenctl target --garden "$LANDSCAPE"
 
   echo "Setting up kubectl environment..."
@@ -88,7 +88,7 @@ function generateKubeConfigs() {
 
   local projNamespace
   projNamespace="garden-$PROJECT"
-  echo "⌛ Generating viewer kubeconfig for shoot: $SHOOT and project namespace: ${projNamespace} ..."
+  echo "⌛ Generating viewer kubeconfig for shoot: $SHOOT and project namespace: '${projNamespace}' ..."
   vkcfg=$(kubectl create \
       -f <(printf '{"spec":{"expirationSeconds":86400}}') \
       --raw "/apis/core.gardener.cloud/v1beta1/namespaces/${projNamespace}/shoots/${SHOOT}/viewerkubeconfig" | \
@@ -110,26 +110,6 @@ function genSchedulerConfig() {
   echo "✅ Generated kube-scheduler config at $SCHEDULER_CONFIG"
 }
 
-function generate_kubeconfig() {
-  echo "Creating kubeconfig for the cluster"
-  kubectl config set-cluster local \
-    --certificate-authority=gen/ca.crt \
-    --server=https://127.0.0.1:6443 \
-    --kubeconfig=gen/kubeconfig \
-    --embed-certs=true
-
-  kubectl config set-credentials admin \
-    --client-certificate=gen/client.crt \
-    --client-key=gen/client.key \
-    --kubeconfig=gen/kubeconfig \
-    --embed-certs=true
-
-  kubectl config set-context local \
-    --cluster=local \
-    --user=admin \
-    --kubeconfig=gen/kubeconfig
-}
-
 
 validateCommandInPath "kine"
 validateCommandInPath "jq"
@@ -148,11 +128,14 @@ echo "Setup signal handler"
 rm -rf db/
 mkdir db
 
-generateKubeConfigs
+generateViewerKubeConfigs
 downloadObjectsFromCluster
 
 echo "⌛ Starting kine"
-kine > /tmp/kine.log 2>&1 &
+#dirPath=$(realpath .)
+echo "echo current dir is $PWD"
+#echo "Current dir is $dirPath"
+kine  > /tmp/kine.log 2>&1 &
 KINEPID=$!
 echo "waiting for kine to start up"
 sleep 5
@@ -163,17 +146,15 @@ generate_certs
 generate_kubeconfig
 echo "⌛ Starting kube-apiserver"
 #TODO: Get proper IP for advertise-address
-bin/kube-apiserver \
+$SCRIPT_DIR/bin/kube-apiserver \
 --etcd-servers=http://127.0.0.1:2379 \
---client-ca-file=gen/ca.crt \
---tls-cert-file=gen/apiserver.crt \
---tls-private-key-file=gen/apiserver.key \
+--client-ca-file="$caCrtPath" \
+--tls-cert-file="$apiServerCrtPath" \
+--tls-private-key-file="$apiServerKeyPath" \
 --authorization-mode=Node,RBAC \
 --service-cluster-ip-range=10.0.0.0/24 \
---advertise-address=10.60.68.45 \
---secure-port=6443 \
---service-account-key-file=gen/sa.key \
---service-account-signing-key-file=gen/sa.key \
+--service-account-key-file="$saKeyPath" \
+--service-account-signing-key-file="$saKeyPath" \
 --service-account-issuer=https://kubernetes.default.svc \
 --v=6 > /tmp/kube-apiserver.log 2>&1 &
 KAPIPID=$!
@@ -181,10 +162,13 @@ echo "waiting for kube-apiserver to start up"
 sleep 5
 echo "✅ Started kube-apiserver. Logs at /tmp/kube-apiserver.log"
 
+echo "sleeping..plesae try kcpcl now..."
+sleep 10000
+exit 0
 
 genSchedulerConfig
 echo "⌛ Starting kube-scheduler"
-bin/kube-scheduler \
+$SCRIPT_DIR/bin/kube-scheduler \
 --config=$SCHEDULER_CONFIG \
 --bind-address=127.0.0.1 \
 --secure-port=8090 \
