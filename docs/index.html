@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Files Side by Side</title>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    >
+    <style>
+        .perf-charts-heading {
+            padding: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<h1 class="perf-charts-heading">🎭 Performance Charts</h1>
+
+<section>
+    <h3 class="perf-charts-heading">MinKAPI vs Kine for 5k,10k simple pods</h3>
+    <ul>
+        <li><a href="reports/simple-pods/5k/minkapi-cp-charts.html">minkapi-5k-simple</a></li>
+        <li><a href="reports/simple-pods/5k/kine-cp-charts.html">kine-5k-simple</a></li>
+        <li><a href="reports/simple-pods/10k/minkapi-cp-charts.html">minkapi-10k-simple</a></li>
+        <li><a href="reports/simple-pods/10k/kine-cp-charts.html">kine-10k-simple</a></li>
+    </ul>
+</section>
+
+<section>
+    <h3 class="perf-charts-heading">MinKAPI vs Kine for EU10 prod-hna0 cluster</h3>
+    <ul>
+        <li><a href="reports/minkapi-perf/prod-hna0-charts.html">minkapi for eu10/prod-hna0</a></li>
+    </ul>
+</section>
+</body>
+</html>

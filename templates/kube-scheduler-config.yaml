@@ -1,0 +1,21 @@
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+clientConnection:
+  qps: 160
+  burst: 130
+  contentType: application/json
+  kubeconfig: $DEST_KUBECONFIG
+leaderElection:
+  leaderElect: false
+profiles:
+  - schedulerName: default-scheduler
+  - schedulerName: bin-packing-scheduler
+    pluginConfig:
+      - name: NodeResourcesFit
+        args:
+          scoringStrategy:
+            type: MostAllocated
+    plugins:
+      score:
+        disabled:
+          - name: NodeResourcesBalancedAllocation
