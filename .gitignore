@@ -4,3 +4,5 @@ db/
 .idea
 
 *.log
+.DS_Store
+default.etcd/

@@ -160,7 +160,7 @@ echo "✅ Started procmon. procmon pid is ${PROCMONPID}"
 
 echo "⌛ Starting kcpcl upload to minkapi"
 echo "OBJ_DIR is $OBJ_DIR"
-time kcpcl upload -d ${OBJ_DIR} -k /tmp/minkapi.yaml
+time kcpcl upload -d ${OBJ_DIR} -k /tmp/minkapi.yaml | tee "/tmp/upload-$perfDirName.log"
 echo "⌛ waiting for STABILIZE_SECS: $STABILIZE_SECS for minkapi cluster to stabilise..."
 sleep  $STABILIZE_SECS #TODO: loop over pod-node assignments until no changes for 20seconds
 

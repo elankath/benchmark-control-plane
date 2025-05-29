@@ -12,6 +12,14 @@
         .perf-charts-heading {
             padding: 0.5rem;
         }
+
+        .perf-charts-subheading {
+            padding: 0.5rem;
+        }
+
+        section {
+            padding: 0.5em
+        }
     </style>
 </head>
 <body>
@@ -20,6 +28,11 @@
 <section>
     <h3 class="perf-charts-heading">MinKAPI vs Kine for 5k,10k simple pods</h3>
     <ul>
+        <li>Load of simple 5knodes,10k simple pods/10k nodes, 20k simple pods. Benchmarks loads objects and gives
+            stabilize time for pod assignment
+        </li>
+    </ul>
+    <ul style="margin-left: 2rem;padding-left: 2rem">
         <li><a href="reports/simple-pods/5k/minkapi-cp-charts.html">minkapi-5k-simple</a></li>
         <li><a href="reports/simple-pods/5k/kine-cp-charts.html">kine-5k-simple</a></li>
         <li><a href="reports/simple-pods/10k/minkapi-cp-charts.html">minkapi-10k-simple</a></li>
@@ -30,8 +43,15 @@
 <section>
     <h3 class="perf-charts-heading">MinKAPI vs Kine for EU10 prod-hna0 cluster</h3>
     <ul>
-        <li><a href="reports/minkapi-perf/prod-hna0-charts.html">minkapi for eu10/prod-hna0</a></li>
-        <li><a href="reports/kine-perf/prod-hna0-charts.html">kine for eu10/prod-hna0</a></li>
+        <li>Load of Prod-hna0 cluster with ~10kpods, ~400 nodes and 27k objects (PVs/PVC's/etc) in total. Benchmarks loads objects and gives
+            stabilize time for pod assignment
+        </li>
+    </ul>
+    <ul style="margin-left: 2rem;padding-left: 2rem">
+        <li><a href="reports/minkapi-perf/prod-hna0-charts.html">minkapi (in-memory) for eu10/prod-hna0</a>
+        </li>
+        <li><a href="reports/kine-perf/prod-hna0-charts.html">kine (with db dir) for eu10/prod-hna0</a></li>
+        <li><a href="reports/etcd-perf/prod-hna0-charts.html">etcd (with db dir) for eu10/prod-hna0</a></li>
     </ul>
 </section>
 </body>

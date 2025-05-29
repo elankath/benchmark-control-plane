@@ -105,16 +105,16 @@ function generateViewerKubeConfigs() {
 
 function genSchedulerConfig() {
   export DEST_KUBECONFIG="$SCRIPT_DIR/gen/kubeconfig"
-  export SCHEDULER_CONFIG="/tmp/kine-kube-scheduler-config.yaml"
+  export SCHEDULER_CONFIG="/tmp/etcd-kube-scheduler-config.yaml"
   envsubst < "templates/kube-scheduler-config.yaml" >  "$SCHEDULER_CONFIG"
   echo "✅ Generated kube-scheduler config at $SCHEDULER_CONFIG"
 }
 
 
-validateCommandInPath "kine"
 validateCommandInPath "jq"
 validateCommandInPath "kcpcl"
 validateCommandInPath "envsubst"
+validateCommandInPath "etcd"
 validateKubeBinariesBuilt
 
 
@@ -124,22 +124,21 @@ trap cleanup EXIT INT TERM
 echo "Setup signal handler"
 
 
-# Clear kine db
-rm -rf db/
-mkdir db
+# Clear etcd db
+rm -rf default.etcd/
 
 generateViewerKubeConfigs
 downloadObjectsFromCluster
 
-echo "⌛ Starting kine"
+echo "⌛ Starting etcd"
 #dirPath=$(realpath .)
 echo "echo current dir is $PWD"
 #echo "Current dir is $dirPath"
-kine  > /tmp/kine.log 2>&1 &
-KINEPID=$!
-echo "waiting for kine to start up"
-sleep 10
-echo "✅ Started kine. Logs: /tmp/kine.log, pid: $KINEPID"
+etcd  > /tmp/etcd.log 2>&1 &
+ETCDPID=$!
+echo "waiting for etcd to start up"
+sleep 5
+echo "✅ Started etcd. Logs: /tmp/etcd.log, pid: $ETCDPID"
 
 
 generate_certs
@@ -178,9 +177,9 @@ sleep 10
 echo "✅ Started kube-scheduler. Logs at /tmp/kube-scheduler.log"
 
 echo "⌛ Staring procmon"
-perfDirName="kine-perf"
+perfDirName="etcd-perf"
 perfDirPath="/tmp/$perfDirName"
-procmon -d $perfDirPath -interval 5s -n "$SHOOT"  kine kube-apiserver kube-scheduler &
+procmon -d $perfDirPath -interval 5s -n "$SHOOT"  etcd kube-apiserver kube-scheduler &
 PROCMONPID=$!
 echo "waiting for procmon to start up"
 sleep 12
@@ -188,7 +187,7 @@ echo "✅ Started procmon"
 
 echo "⌛ Starting kcpcl upload to minkapi"
 echo "OBJ_DIR is $OBJ_DIR"
-time kcpcl upload -d ${OBJ_DIR} -k $DEST_KUBECONFIG |   tee "/tmp/upload-$perfDirName.log"
+time kcpcl upload -d ${OBJ_DIR} -k $DEST_KUBECONFIG | tee "/tmp/upload-$perfDirName.log"
 echo "⌛ waiting for STABILIZE_SECS: $STABILIZE_SECS for minkapi cluster to stabilise..."
 sleep  $STABILIZE_SECS #TODO: loop over pod-node assignments until no changes for 20seconds
 
