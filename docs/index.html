@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Files Side by Side</title>
+    <title>Performance Benchmarks</title>
     <link
             rel="stylesheet"
             href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
     >
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
         .perf-charts-heading {
             padding: 0.5rem;
@@ -52,6 +53,56 @@
         </li>
         <li><a href="reports/kine-perf/prod-hna0-charts.html">kine (with db dir) for eu10/prod-hna0</a></li>
         <li><a href="reports/etcd-perf/prod-hna0-charts.html">etcd (with db dir) for eu10/prod-hna0</a></li>
+    </ul>
+</section>
+
+<section>
+    <h3 class="perf-charts-heading">Scale-20 | CA Performance Benchmarks for demo-hc-3-haas</h3>
+    <ul>
+        <li>
+            ClusterSnapshot: Load of 1702 Pods, 382 Unscheduled Pods, 78 Existing Nodes.
+        </li>
+        <li>
+            Total Scaled Nodes: 20, Scaling Time: ~7m
+        <pre><code>IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-li4-vm-g-z1" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-default-z2" with delta 6,
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-c-g-z2" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-g-z2" with delta 3,
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-xs-vm-g-z1" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-default-z3" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-free-vm-g-z2" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-m-m6-vm-g-z2" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-s-vm-g-z3" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-observability-l-z2" with delta 2
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-default-arm-z2" with delta 1
+IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-xs-vm-g-z2" with delta 1</code></pre></li>
+    </ul>
+    <ul style="margin-left: 2rem;padding-left: 2rem">
+        <li><a href="reports/ca-perf/scale-20-ca-perf-charts.html">CA Perf - Scale 20</a></li>
+    </ul>
+</section>
+<section>
+    <h3 class="perf-charts-heading">Scale-30 | CA Performance Benchmarks for demo-hc-3-haas</h3>
+    <ul>
+        <li>
+            ClusterSnapshot: Load of 1702 Pods, 517 Unscheduled Pods, 68 Existing Nodes.
+        </li>
+        <li>
+            Total Scaled Nodes: 30, Scaling Time: ~9m
+            <pre><code>
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-free2-vm-g-z2" with delta 1
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-s-vm-g-z1" with delta 3
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-default-z2" with delta 11
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-m-m6-vm-g-z2" with delta 2
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-li4-vm-g-z3" with delta 1
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-default-arm-z3" with delta 6
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-xs-vm-g-z2" with delta 1
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-hana-li4-vm-g-z2" with delta 1
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-conn-g-z3" with delta 1
+virtual_cloud_provider.go:933] IncreaseSize SCALING finished for "shoot--hc-dev--demo-hc-3-haas.shoot--hc-dev--demo-hc-3-haas-observ-l-f1-z3" with delta 2</code></pre></li>
+    </ul>
+    <ul style="margin-left: 2rem;padding-left: 2rem">
+        <li><a href="reports/ca-perf/scale-30-ca-perf-charts.html">CA Perf - Scale 30</a></li>
     </ul>
 </section>
 </body>
